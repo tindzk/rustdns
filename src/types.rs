@@ -1,5 +1,6 @@
 use crate::resource::*;
 use std::net::SocketAddr;
+use std::net::Ipv4Addr;
 use std::time::Duration;
 use std::time::SystemTime;
 use strum_macros::{Display, EnumString};
@@ -534,6 +535,13 @@ impl Resource {
             Resource::SPF(_) => Type::SPF,
             Resource::OPT => Type::OPT,
             Resource::ANY => Type::ANY,
+        }
+    }
+
+    pub fn r#data(&self) -> Vec<u8> {
+        match self {
+            Resource::A(ip) => u32::from(*ip).to_be_bytes().to_vec(),
+            _ => todo!()
         }
     }
 }

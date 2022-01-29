@@ -258,8 +258,19 @@ impl Message {
             req.extend_from_slice(&(question.class as u16).to_be_bytes());
         }
 
-        // TODO Implement answers, etc types.
-        assert!(self.answers.is_empty());
+        for answer in &self.answers {
+            Message::write_qname(&mut req, &answer.name)?;
+
+            req.extend_from_slice(&(answer.resource.r#type() as u16).to_be_bytes());
+            req.extend_from_slice(&(answer.class as u16).to_be_bytes());
+            req.extend_from_slice(&(answer.ttl.as_secs() as u32).to_be_bytes());
+
+            let rdata = answer.resource.r#data();
+            req.extend_from_slice(&(rdata.len() as u16).to_be_bytes());
+            req.extend_from_slice(&rdata);
+        }
+
+        // TODO Implement authorities, etc types.
         assert!(self.authoritys.is_empty());
         assert!(self.additionals.is_empty());
 
