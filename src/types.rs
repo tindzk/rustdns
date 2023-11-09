@@ -541,6 +541,11 @@ impl Resource {
     pub fn r#data(&self) -> Vec<u8> {
         match self {
             Resource::A(ip) => u32::from(*ip).to_be_bytes().to_vec(),
+            Resource::CNAME(cname) => {
+                let mut result = vec![] as Vec<u8>;
+                Message::write_qname(&mut result, &cname).unwrap();
+                result
+            },
             _ => todo!()
         }
     }

@@ -290,7 +290,7 @@ impl Message {
     /// any compressed pointers) in bytes.
     ///
     // TODO Support compression.
-    fn write_qname(buf: &mut Vec<u8>, domain: &str) -> io::Result<()> {
+    pub fn write_qname(buf: &mut Vec<u8>, domain: &str) -> io::Result<()> {
         // Decode this label into the original unicode.
         // TODO Switch to using our own idna::Config. (but we can't use disallowed_by_std3_ascii_rules).
         let domain = match idna::domain_to_ascii(domain) {

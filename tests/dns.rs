@@ -3,9 +3,10 @@
 // and custom_test_frameworks is supported https://github.com/rust-lang/rust/issues/50297
 use pretty_assertions::assert_eq;
 use regex::Regex;
-use rustdns::Message;
+use rustdns::{Class, Message, QR, Rcode, Record};
 use serde::Deserialize;
 use std::fs;
+use std::time::Duration;
 
 const TEST_DATA_FILENAME: &str = "tests/test_data.yaml";
 
@@ -58,4 +59,27 @@ fn test_from_slice(case: TestCase) {
     assert_eq!(got, want, "{}: Formatted string doesn't match", case.name);
 
     // TODO Test writing the result back out.
+}
+
+#[test]
+fn encode_record() {
+    let message = Message {
+        id: 1234,
+        qr: QR::Response,
+        ra: true,
+        aa: true,
+        rcode: Rcode::NoError,
+        questions: vec![],
+        answers: vec![Record::new(
+            "docker.local.",
+            Class::Internet,
+            Duration::from_secs(60),
+            rustdns::Resource::CNAME("host.docker.internal.".to_string())
+        )],
+        ..Message::default()
+    };
+
+    let serialised = message.to_vec().unwrap();
+    let parsed_message = Message::from_slice(&serialised).unwrap();
+    assert_eq!(message, parsed_message);
 }
